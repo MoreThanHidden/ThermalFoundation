@@ -8,17 +8,13 @@ import cofh.core.util.CoreUtils;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.lib.util.helpers.WrenchHelper;
 import cofh.thermalfoundation.ThermalFoundation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLiving.SpawnPlacementType;
 import net.minecraft.entity.item.EntityItem;
@@ -26,10 +22,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -37,26 +34,31 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitializer, IModelRegister {
 
 	public static final PropertyEnum<BlockGlass.Type> VARIANT = PropertyEnum.<BlockGlass.Type> create("type", BlockGlass.Type.class);
 
 	public BlockGlass() {
 
-		super(Material.glass, "thermalfoundation");
+		super(Material.GLASS, "thermalfoundation");
 
 		setUnlocalizedName("glass");
 		setCreativeTab(ThermalFoundation.tabCommon);
 
 		setHardness(3.0F);
 		setResistance(200.0F);
-		setStepSound(soundTypeGlass);
+		setSoundType(SoundType.GLASS);
 	}
 
 	@Override
-	protected BlockState createBlockState() {
+	protected BlockStateContainer createBlockState() {
 
-		return new BlockState(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, new IProperty[] { VARIANT });
 	}
 
 	@Override
@@ -75,18 +77,16 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public EnumWorldBlockLayer getBlockLayer() {
-
-		return EnumWorldBlockLayer.TRANSLUCENT;
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.TRANSLUCENT;
 	}
 
-	@Override
-	public int getDamageValue(World world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
-		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-	}
+//	@Override
+//	public int getDamageValue(World world, BlockPos pos) {
+//
+//		IBlockState state = world.getBlockState(pos);
+//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
+//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -107,16 +107,13 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 	}
 
 	@Override
-	public int getLightValue(IBlockAccess world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return Type.byMetadata(state.getBlock().getMetaFromState(state)).light;
 	}
 
 	@Override
-	public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-
-		return getMetaFromState(state) == Type.SIGNALUM.getMetadata() ? 15 : 0;
+	public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+		return getMetaFromState(blockState) == Type.SIGNALUM.getMetadata() ? 15 : 0;
 	}
 
 	@Override
@@ -126,31 +123,30 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 	}
 
 	@Override
-	public boolean canCreatureSpawn(IBlockAccess world, BlockPos pos, SpawnPlacementType type) {
-
+	public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, SpawnPlacementType type) {
 		return false;
 	}
 
 	@Override
-	public boolean canProvidePower() {
-
+	public boolean canProvidePower(IBlockState state) {
 		return true;
 	}
 
 	@Override
-	public boolean isFullCube() {
+	public boolean isFullCube(IBlockState state) {
 
 		return false;
 	}
 
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 
 		return false;
 	}
 
+
 	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, @Nullable ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
 
 		if (player.isSneaking()) {
 			if (WrenchHelper.isHoldingUsableWrench(player, pos)) {
@@ -207,9 +203,9 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-
-		GameRegistry.registerBlock(this, ItemBlockGlass.class, "glass");
-
+		setRegistryName("thermalfoundation:glass");
+		GameRegistry.register(this);
+		GameRegistry.register(new ItemBlockGlass(this));
 		glassCopper = new ItemStack(this, 1, Type.COPPER.getMetadata());
 		glassTin = new ItemStack(this, 1, Type.TIN.getMetadata());
 		glassSilver = new ItemStack(this, 1, Type.SILVER.getMetadata());

@@ -5,9 +5,6 @@ import cofh.core.util.CoreUtils;
 import cofh.lib.util.BlockWrapper;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.block.TFBlocks;
-
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -15,18 +12,20 @@ import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import java.util.Random;
+
 public class BlockFluidMana extends BlockFluidInteractive {
 
 	public static final int LEVELS = 6;
-	public static final Material materialFluidMana = new MaterialLiquid(MapColor.purpleColor);
+	public static final Material materialFluidMana = new MaterialLiquid(MapColor.PURPLE);
 
 	private static boolean effect = true;
 	private static boolean enableSourceFall = true;
@@ -43,8 +42,7 @@ public class BlockFluidMana extends BlockFluidInteractive {
 	}
 
 	@Override
-	public int getWeakPower(IBlockAccess world, BlockPos pos, IBlockState state, EnumFacing side) {
-
+	public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 		return effect ? 15 : 0;
 	}
 
@@ -60,7 +58,7 @@ public class BlockFluidMana extends BlockFluidInteractive {
 			}
 			BlockPos pos2 = pos.add(-8 + world.rand.nextInt(17), world.rand.nextInt(8), -8 + world.rand.nextInt(17));
 
-			if (!world.getBlockState(pos2).getBlock().getMaterial().isSolid()) {
+			if (!world.getBlockState(pos2).getBlock().getMaterial(state).isSolid()) {
 				CoreUtils.teleportEntityTo(entity, pos2.getX(), pos2.getY(), pos2.getZ());
 			}
 		}
@@ -112,7 +110,7 @@ public class BlockFluidMana extends BlockFluidInteractive {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 
-		if (block.isAir(world, pos) || block == this) {
+		if (block.isAir(state, world, pos) || block == this) {
 			return;
 		}
 		int bMeta = block.getMetaFromState(state);
@@ -124,9 +122,9 @@ public class BlockFluidMana extends BlockFluidInteractive {
 			triggerInteractionEffects(world, pos);
 		} else if (world.isSideSolid(pos, EnumFacing.UP) && world.isAirBlock(pos.add(0, 1, 0))) {
 			if (world.rand.nextInt(2) % 2 == 0) {
-				world.setBlockState(pos.add(0, 1, 0), Blocks.snow_layer.getDefaultState(), 2);
+				world.setBlockState(pos.add(0, 1, 0), Blocks.SNOW_LAYER.getDefaultState(), 2);
 			} else {
-				world.setBlockState(pos.add(0, 1, 0), Blocks.fire.getDefaultState(), 2);
+				world.setBlockState(pos.add(0, 1, 0), Blocks.FIRE.getDefaultState(), 2);
 			}
 		}
 	}
@@ -134,8 +132,9 @@ public class BlockFluidMana extends BlockFluidInteractive {
 	protected void triggerInteractionEffects(World world, BlockPos pos) {
 
 		if (world.rand.nextInt(10) == 0) {
-			world.playSoundEffect(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, "random.orb", 0.5F,
-					2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
+			//TODO figure out the random.orb sound effect
+//			world.playSound(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, "random.orb", 0.5F,
+//					2.6F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
 		}
 		for (int i = 0; i < 8; i++) {
 			world.spawnParticle(EnumParticleTypes.ENCHANTMENT_TABLE, pos.getX() + Math.random() * 1.1, pos.getY() + 1.3D, pos.getZ() + Math.random() * 1.1,
@@ -149,9 +148,9 @@ public class BlockFluidMana extends BlockFluidInteractive {
 
 		GameRegistry.registerBlock(this, "FluidMana");
 
-		addInteraction(Blocks.dirt, 0, Blocks.grass);
-		addInteraction(Blocks.dirt, 1, Blocks.dirt, 2);
-		addInteraction(Blocks.glass, Blocks.sand);
+		addInteraction(Blocks.DIRT, 0, Blocks.GRASS);
+		addInteraction(Blocks.DIRT, 1, Blocks.DIRT, 2);
+		addInteraction(Blocks.GLASS, Blocks.SAND);
 		// addInteraction(Blocks.stained_glass, -1, Blocks.glass);
 		// addInteraction(Blocks.diamond_ore, -1, TFBlocks.blockOre, 1);
 		// addInteraction(Blocks.cauldron, -1, Blocks.carpet, 1);
@@ -160,16 +159,16 @@ public class BlockFluidMana extends BlockFluidInteractive {
 		// addInteraction(Blocks.bookshelf, 0, Blocks.chest, 0);
 		// addInteraction(Blocks.ender_chest, -1, TFBlocks.blockFluidEnder, 1);
 		// addInteraction(Blocks.dragon_egg, -1, Blocks.bedrock, 1);
-		addInteraction(Blocks.redstone_ore, -1, Blocks.lit_redstone_ore, 0);
-		addInteraction(Blocks.lapis_ore, -1, Blocks.lapis_block, 0);
-		addInteraction(Blocks.farmland, -1, Blocks.mycelium, 0);
+		addInteraction(Blocks.REDSTONE_ORE, -1, Blocks.LIT_REDSTONE_ORE, 0);
+		addInteraction(Blocks.LAPIS_ORE, -1, Blocks.LAPIS_BLOCK, 0);
+		addInteraction(Blocks.FARMLAND, -1, Blocks.MYCELIUM, 0);
 		for (int i = 8; i-- > 0;) {
-			addInteraction(Blocks.double_stone_slab, i, Blocks.double_stone_slab, i + 8);
+			addInteraction(Blocks.DOUBLE_STONE_SLAB, i, Blocks.DOUBLE_STONE_SLAB, i + 8);
 		}
 		addInteraction(TFBlocks.blockOre, 2, TFBlocks.blockOre, 6);
-		addInteraction(TFBlocks.blockOre, 3, Blocks.gold_ore);
+		addInteraction(TFBlocks.blockOre, 3, Blocks.GOLD_ORE);
 		addInteraction(TFBlocks.blockStorage, 2, TFBlocks.blockStorage, 6);
-		addInteraction(TFBlocks.blockStorage, 3, Blocks.gold_block);
+		addInteraction(TFBlocks.blockStorage, 3, Blocks.GOLD_BLOCK);
 
 		String category = "Fluid.Mana";
 		String comment = "Enable this for Fluid Mana to do...things.";

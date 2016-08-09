@@ -1,31 +1,29 @@
 package cofh.thermalfoundation.block;
 
-import static cofh.lib.util.helpers.ItemHelper.addSmelting;
-
 import cofh.api.core.IInitializer;
 import cofh.api.core.IModelRegister;
 import cofh.core.block.BlockCoFHBase;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.item.ItemMaterial;
-
-import java.util.List;
-
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
+
+import static cofh.lib.util.helpers.ItemHelper.addSmelting;
 
 public class BlockRockwool extends BlockCoFHBase implements IInitializer, IModelRegister {
 
@@ -33,23 +31,23 @@ public class BlockRockwool extends BlockCoFHBase implements IInitializer, IModel
 
 	public BlockRockwool() {
 
-		super(Material.rock, "thermalfoundation");
+		super(Material.ROCK, "thermalfoundation");
 
 		setUnlocalizedName("rockwool");
 		setCreativeTab(ThermalFoundation.tabCommon);
 
 		setHardness(0.8F);
 		setResistance(10.0F);
-		setStepSound(soundTypeCloth);
+		setSoundType(SoundType.CLOTH);
 		setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, Type.GRAY));
 
 		setHarvestLevel("pickaxe", 1);
 	}
 
 	@Override
-	protected BlockState createBlockState() {
+	protected BlockStateContainer createBlockState() {
 
-		return new BlockState(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, new IProperty[] { VARIANT });
 	}
 
 	@Override
@@ -61,12 +59,12 @@ public class BlockRockwool extends BlockCoFHBase implements IInitializer, IModel
 		}
 	}
 
-	@Override
-	public int getDamageValue(World world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
-		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-	}
+//	@Override
+//	public int getDamageValue(World world, BlockPos pos) {
+//
+//		IBlockState state = world.getBlockState(pos);
+//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
+//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -100,8 +98,9 @@ public class BlockRockwool extends BlockCoFHBase implements IInitializer, IModel
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-
-		GameRegistry.registerBlock(this, ItemBlockRockwool.class, "rockwool");
+		setRegistryName("thermalfoundation:rockWool");
+		GameRegistry.register(this);
+		GameRegistry.register(new ItemBlockRockwool(this));
 
 		rockwoolBlack = new ItemStack(this, 1, Type.BLACK.getMetadata());
 		rockwoolRed = new ItemStack(this, 1, Type.RED.getMetadata());

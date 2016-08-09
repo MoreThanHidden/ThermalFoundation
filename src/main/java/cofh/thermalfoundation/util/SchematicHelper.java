@@ -1,18 +1,11 @@
 package cofh.thermalfoundation.util;
 
-import cofh.core.util.OreDictionaryArbiter;
 import cofh.lib.inventory.InventoryCraftingFalse;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.lib.util.helpers.StringHelper;
 import cofh.thermalfoundation.item.ItemDiagram;
-
 import gnu.trove.map.TMap;
 import gnu.trove.map.hash.THashMap;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -22,6 +15,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class SchematicHelper {
 
 	private SchematicHelper() {
@@ -29,7 +26,6 @@ public class SchematicHelper {
 	}
 
 	public static void addInformation(ItemStack stack, List<String> list) {
-
 		if (!stack.hasTagCompound()) {
 			list.add(StringHelper.getInfoText("info.cofh.blank"));
 			return;
@@ -126,18 +122,18 @@ public class SchematicHelper {
 				nbt.setTag("Slot" + i, itemTag);
 				nbt.setString("Name" + i, craftSlots.getStackInSlot(i).getDisplayName());
 
-				ArrayList<String> oreNames = OreDictionaryArbiter.getOreNames(craftSlots.getStackInSlot(i));
+				ArrayList<String> oreNames = (ArrayList<String>) ItemHelper.getOreNames(craftSlots.getStackInSlot(i));
 				if (oreNames != null) {
 					String validName = "";
 					int validSize = 0;
 					for (String oreName : oreNames) {
-						if (oreName.equals(OreDictionaryArbiter.UNKNOWN)) {
+						if (oreName.equals("Unknown")) {
 							continue;
 						}
 						l: {
 							copyInventory(craftSlots, workingSet);
 							int size = 0;
-							for (ItemStack stack : OreDictionaryArbiter.getOres(oreName)) {
+							for (ItemStack stack : OreDictionary.getOres(oreName)) {
 								NBTTagCompound tag = stack.getTagCompound();
 								int damage = Math.max(0, stack.getItemDamage());
 								if (damage == OreDictionary.WILDCARD_VALUE) {
@@ -186,10 +182,10 @@ public class SchematicHelper {
 				nbt.setTag("Slot" + i, itemTag);
 				nbt.setString("Name" + i, craftSlots.getStackInSlot(i).getDisplayName());
 
-				ArrayList<String> oreNames = OreDictionaryArbiter.getOreNames(craftSlots.getStackInSlot(i));
+				ArrayList<String> oreNames = (ArrayList<String>) ItemHelper.getOreNames(craftSlots.getStackInSlot(i));
 				if (oreNames != null) {
 					for (String oreName : oreNames) {
-						if (!oreName.startsWith("list") && !oreName.equals(OreDictionaryArbiter.UNKNOWN) && !ItemHelper.isBlacklist(output)) {
+						if (!oreName.startsWith("list") && !oreName.equals("Unknown") && !ItemHelper.isBlacklist(output)) {
 							nbt.setString("Ore" + i, oreName);
 						}
 					}

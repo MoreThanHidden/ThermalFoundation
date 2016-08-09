@@ -26,10 +26,10 @@ public class TFItems {
 		initList.add(itemMaterial);
 
 		ProxyClient.modelList.add(itemWrench);
-		ProxyClient.modelList.add(itemMeter);
-		ProxyClient.modelList.add(itemDiagram);
-		ProxyClient.modelList.add(itemFertilizer);
-		ProxyClient.modelList.add(itemMaterial);
+//		ProxyClient.modelList.add(itemMeter);
+//		ProxyClient.modelList.add(itemDiagram);
+//		ProxyClient.modelList.add(itemFertilizer);
+//		ProxyClient.modelList.add(itemMaterial);
 
 		for (int i = 0; i < initList.size(); i++) {
 			initList.get(i).preInit();

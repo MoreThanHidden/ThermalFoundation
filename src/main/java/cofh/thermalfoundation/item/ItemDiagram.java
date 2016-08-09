@@ -1,11 +1,7 @@
 package cofh.thermalfoundation.item;
 
-import static cofh.lib.util.helpers.ItemHelper.*;
-
 import cofh.api.core.IInitializer;
 import cofh.api.tileentity.IPortableData;
-import cofh.core.item.ItemCoFHBase;
-import cofh.core.util.StateMapper;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.lib.util.helpers.StringHelper;
@@ -13,30 +9,24 @@ import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.util.PatternHelper;
 import cofh.thermalfoundation.util.RedprintHelper;
 import cofh.thermalfoundation.util.SchematicHelper;
-
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class ItemDiagram extends ItemCoFHBase implements IInitializer {
+import java.util.List;
+
+public class ItemDiagram extends Item implements IInitializer {
 
 	public ItemDiagram() {
 
-		super("thermalfoundation");
+//		super("thermalfoundation");
 
 		setUnlocalizedName("diagram");
 		setCreativeTab(ThermalFoundation.tabCommon);
@@ -68,43 +58,44 @@ public class ItemDiagram extends ItemCoFHBase implements IInitializer {
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 
-		return player.canPlayerEdit(pos.offset(side), side, stack);
+		return player.canPlayerEdit(pos.offset(facing), facing, stack)? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-
+	public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
 		if (player.isSneaking()) {
 			if (stack.hasTagCompound()) {
-				world.playSoundAtEntity(player, "random.orb", 0.5F, 0.3F);
+				//TODO figure out soundEvent
+//				world.playSound(player, "random.orb", 0.5F, 0.3F);
 			}
 			stack.setTagCompound(null);
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
 		switch (Type.values()[ItemHelper.getItemDamage(stack)]) {
 		case REDPRINT:
 			doRedprintUseFirst(stack, player, world, pos, side);
 			break;
 		default:
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
 		ServerHelper.sendItemUsePacket(stack, player, world, pos, side, hitX, hitY, hitZ);
-		return true;
+		return EnumActionResult.SUCCESS;
 	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
+	public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player, EnumHand hand) {
 
 		if (player.isSneaking()) {
 			if (stack.hasTagCompound()) {
-				world.playSoundAtEntity(player, "random.orb", 0.5F, 0.3F);
+				//TODO sound
+//				world.playSoundAtEntity(player, "random.orb", 0.5F, 0.3F);
 			}
 			stack.setTagCompound(null);
 		}
-		player.swingItem();
-		return stack;
+		player.swingArm(hand);
+		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 	}
 
 	private void doRedprintUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
@@ -122,7 +113,8 @@ public class ItemDiagram extends ItemCoFHBase implements IInitializer {
 					stack.setTagCompound(null);
 				} else {
 					stack.getTagCompound().setString("Type", ((IPortableData) tile).getDataType());
-					world.playSoundAtEntity(player, "random.orb", 0.5F, 0.7F);
+					//TODO sound
+//					world.playSoundAtEntity(player, "random.orb", 0.5F, 0.7F);
 				}
 			} else {
 				if (stack.getTagCompound().getString("Type").equals(((IPortableData) tile).getDataType())) {
@@ -157,25 +149,25 @@ public class ItemDiagram extends ItemCoFHBase implements IInitializer {
 
 		return RedprintHelper.getDisplayName(stack).isEmpty() ? EnumRarity.COMMON : EnumRarity.UNCOMMON;
 	}
-
-	/* IModelRegister */
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerModels() {
-
-		StateMapper mapper = new StateMapper(modName, "tool", name);
-		ModelBakery.registerItemVariants(this);
-		ModelLoader.setCustomMeshDefinition(this, mapper);
-
-		for (Map.Entry<Integer, ItemEntry> entry : itemMap.entrySet()) {
-			ModelLoader.setCustomModelResourceLocation(this, entry.getKey(), new ModelResourceLocation(modName + ":" + "tool", entry.getValue().name));
-		}
-	}
+//TODO figure this out
+//	/* IModelRegister */
+//	@Override
+//	@SideOnly(Side.CLIENT)
+//	public void registerModels() {
+//
+////		StateMapper mapper = new StateMapper(modName, "tool", name);
+//		ModelBakery.registerItemVariants(this);
+////		ModelLoader.setCustomMeshDefinition(this, mapper);
+//
+////		for (Map.Entry<Integer, ItemEntry> entry : itemMap.entrySet()) {
+////			ModelLoader.setCustomModelResourceLocation(this, entry.getKey(), new ModelResourceLocation(modName + ":" + "tool", entry.getValue().name));
+////		}
+//	}
 
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-
+//TODO figure this out
 		schematic = addItem(Type.SCHEMATIC.ordinal(), "schematic");
 		redprint = addItem(Type.REDPRINT.ordinal(), "redprint");
 
@@ -191,12 +183,17 @@ public class ItemDiagram extends ItemCoFHBase implements IInitializer {
 	@Override
 	public boolean postInit() {
 
-		addRecipe(ShapelessRecipe(schematic, new Object[] { Items.paper, Items.paper, "dyeBlue" }));
-		addRecipe(ShapelessRecipe(redprint, new Object[] { Items.paper, Items.paper, "dustRedstone" }));
+//		addRecipe(ShapelessRecipe(schematic, new Object[] { Items.PAPER, Items.PAPER, "dyeBlue" }));
+//		addRecipe(ShapelessRecipe(redprint, new Object[] { Items.PAPER, Items.PAPER, "dustRedstone" }));
 
 		return true;
 	}
+	public ItemStack addItem(int number, String key) {
 
+		ItemStack item = new ItemStack(new ItemDiagram(), 1, number);
+		GameRegistry.register(item.getItem(), new ResourceLocation("thermalfoundation:" + key));
+		return item;
+	}
 	/* REFERENCES */
 	public static ItemStack schematic;
 	public static ItemStack pattern;

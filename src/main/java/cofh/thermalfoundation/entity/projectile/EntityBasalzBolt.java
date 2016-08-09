@@ -5,17 +5,17 @@ import cofh.core.util.CoreUtils;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.entity.monster.EntityBasalz;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.init.MobEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,7 +55,7 @@ public class EntityBasalzBolt extends EntityThrowable {
 	}
 
 	@Override
-	protected void onImpact(MovingObjectPosition pos) {
+	protected void onImpact(RayTraceResult pos) {
 
 		if (ServerHelper.isServerWorld(worldObj)) {
 			if (pos.entityHit != null) {
@@ -104,15 +104,15 @@ public class EntityBasalzBolt extends EntityThrowable {
 
 	protected static class PotionEffectBasalz extends PotionEffect {
 
-		public PotionEffectBasalz(int id, int duration, int amplifier) {
+		public PotionEffectBasalz(Potion potion, int duration, int amplifier) {
 
-			super(id, duration, amplifier, true, false);
+			super(potion, duration, amplifier, true, false);
 			getCurativeItems().clear();
 		}
 
 		public PotionEffectBasalz(int duration, int amplifier) {
 
-			this(Potion.weakness.id, duration, amplifier);
+			this(MobEffects.WEAKNESS, duration, amplifier);
 		}
 
 	}

@@ -1,33 +1,33 @@
 package cofh.thermalfoundation.block;
 
-import static cofh.lib.util.helpers.ItemHelper.*;
-
 import cofh.api.core.IInitializer;
 import cofh.api.core.IModelRegister;
 import cofh.core.block.BlockCoFHBase;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.item.ItemMaterial;
-
-import java.util.List;
-
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
+
+import static cofh.lib.util.helpers.ItemHelper.addSmelting;
+import static cofh.lib.util.helpers.ItemHelper.registerWithHandlers;
 
 public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegister {
 
@@ -35,14 +35,14 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 
 	public BlockOre() {
 
-		super(Material.rock, "thermalfoundation");
+		super(Material.ROCK, "thermalfoundation");
 
 		setUnlocalizedName("ore");
 		setCreativeTab(ThermalFoundation.tabCommon);
 
 		setHardness(3.0F);
 		setResistance(5.0F);
-		setStepSound(soundTypeStone);
+		setSoundType(SoundType.STONE);
 		setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, Type.COPPER));
 
 		setHarvestLevel("pickaxe", 2);
@@ -52,9 +52,9 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 	}
 
 	@Override
-	protected BlockState createBlockState() {
+	protected BlockStateContainer createBlockState() {
 
-		return new BlockState(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, new IProperty[] { VARIANT });
 	}
 
 	@Override
@@ -66,12 +66,12 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 		}
 	}
 
-	@Override
-	public int getDamageValue(World world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
-		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-	}
+//	@Override
+//	public int getDamageValue(World world, BlockPos pos) {
+//
+//		IBlockState state = world.getBlockState(pos);
+//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
+//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -92,9 +92,7 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 	}
 
 	@Override
-	public int getLightValue(IBlockAccess world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 		return Type.byMetadata(state.getBlock().getMetaFromState(state)).light;
 	}
 
@@ -112,8 +110,10 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
+		setRegistryName("thermalfoundation:ore");
+		GameRegistry.register(this);
+		GameRegistry.register(new ItemBlockOre(this));
 
-		GameRegistry.registerBlock(this, ItemBlockOre.class, "ore");
 
 		oreCopper = new ItemStack(this, 1, Type.COPPER.getMetadata());
 		oreTin = new ItemStack(this, 1, Type.TIN.getMetadata());

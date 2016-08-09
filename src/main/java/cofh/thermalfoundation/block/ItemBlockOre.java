@@ -1,19 +1,19 @@
 package cofh.thermalfoundation.block;
 
-import cofh.core.item.ItemBlockCoFHBase;
 import cofh.lib.util.helpers.ItemHelper;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockOre extends ItemBlockCoFHBase {
+public class ItemBlockOre extends ItemBlock {
 
 	public ItemBlockOre(Block block) {
 
 		super(block);
 		setHasSubtypes(true);
 		setMaxDamage(0);
+		setRegistryName(block.getRegistryName().toString() + "Item");
 	}
 
 	@Override

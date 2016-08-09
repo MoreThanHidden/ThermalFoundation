@@ -4,25 +4,21 @@ import cofh.api.core.IInitializer;
 import cofh.api.core.IModelRegister;
 import cofh.core.block.BlockCoFHBase;
 import cofh.thermalfoundation.ThermalFoundation;
-
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.EnumPlantType;
@@ -31,13 +27,17 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Random;
+
 public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRegister, IPlantable {
 
 	public static final PropertyEnum<BlockFlower.Type> VARIANT = PropertyEnum.<BlockFlower.Type> create("type", BlockFlower.Type.class);
 
 	public BlockFlower() {
 
-		super(Material.plants, "thermalfoundation");
+		super(Material.PLANTS, "thermalfoundation");
 
 		setUnlocalizedName("flower");
 		setCreativeTab(ThermalFoundation.tabCommon);
@@ -46,14 +46,18 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 
 		setTickRandomly(true);
 		float f = 0.2F;
-		setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 3.0F, 0.5F + f);
+
 
 	}
 
 	@Override
-	protected BlockState createBlockState() {
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return new AxisAlignedBB(0.3,0,0.6,0.8,0.2*3,0.8);
+	}
 
-		return new BlockState(this, new IProperty[] { VARIANT });
+	@Override
+	protected BlockStateContainer createBlockState() {
+		return new BlockStateContainer(this, new IProperty[] { VARIANT });
 	}
 
 	@Override
@@ -65,12 +69,12 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 		}
 	}
 
-	@Override
-	public int getDamageValue(World world, BlockPos pos) {
-
-		IBlockState state = world.getBlockState(pos);
-		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-	}
+//	@Override
+//	public int getDamageValue(World world, BlockPos pos) {
+//
+//		IBlockState state = world.getBlockState(pos);
+//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
+//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -79,7 +83,6 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 	}
 
 	protected void checkAndDropBlock(World world, BlockPos pos, IBlockState state) {
-
 		if (!canBlockStay(world, pos, state)) {
 			dropBlockAsItem(world, pos, state, 0);
 			world.setBlockToAir(pos);
@@ -87,10 +90,9 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state, Block neighbor) {
-
-		super.onNeighborBlockChange(world, pos, state, neighbor);
-		checkAndDropBlock(world, pos, state);
+	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn) {
+		super.neighborChanged(state, worldIn, pos, blockIn);
+		checkAndDropBlock(worldIn, pos, state);
 	}
 
 	@Override
@@ -112,9 +114,8 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 	}
 
 	@Override
-	public int getLightValue(IBlockAccess world, BlockPos pos) {
+	public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
 
-		IBlockState state = world.getBlockState(pos);
 		return BlockFlower.Type.byMetadata(state.getBlock().getMetaFromState(state)).light;
 	}
 
@@ -125,44 +126,42 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 		if (state.getBlock() != this) {
 			return this.canPlaceBlockOn(soil);
 		}
-		return soil.canSustainPlant(worldIn, down, net.minecraft.util.EnumFacing.UP, this);
+		return soil.canSustainPlant(state, worldIn, down, net.minecraft.util.EnumFacing.UP, this);
 	}
 
 	@Override
 	public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
 
 		return super.canPlaceBlockAt(worldIn, pos)
-				&& worldIn.getBlockState(pos.down()).getBlock().canSustainPlant(worldIn, pos.down(), net.minecraft.util.EnumFacing.UP, this);
+				&& worldIn.getBlockState(pos.down()).getBlock().canSustainPlant(worldIn.getBlockState(pos),worldIn, pos.down(), net.minecraft.util.EnumFacing.UP, this);
 	}
 
 	protected boolean canPlaceBlockOn(Block ground) {
 
-		return ground == Blocks.grass || ground == Blocks.dirt || ground == Blocks.farmland;
+		return ground == Blocks.GRASS || ground == Blocks.DIRT || ground == Blocks.FARMLAND;
 	}
 
 	@Override
-	public boolean isFullCube() {
-
+	public boolean isFullCube(IBlockState state) {
 		return false;
 	}
 
 	@Override
-	public boolean isOpaqueCube() {
+	public boolean isOpaqueCube(IBlockState state) {
 
 		return false;
 	}
 
+	@Nullable
 	@Override
-	public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
 
 		return null;
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public EnumWorldBlockLayer getBlockLayer() {
-
-		return EnumWorldBlockLayer.CUTOUT;
+	public BlockRenderLayer getBlockLayer() {
+		return BlockRenderLayer.CUTOUT;
 	}
 
 	/* IPlantable */
@@ -187,8 +186,9 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-
-		GameRegistry.registerBlock(this, ItemBlockFlower.class, "flower");
+		setRegistryName("thermalfoundation:flower");
+		GameRegistry.register(this);
+		GameRegistry.register(new ItemBlockFlower(this));
 
 		return true;
 	}

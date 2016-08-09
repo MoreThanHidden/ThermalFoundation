@@ -8,9 +8,6 @@ import cofh.thermalfoundation.core.Proxy;
 import cofh.thermalfoundation.fluid.TFFluids;
 import cofh.thermalfoundation.gui.CreativeTabTF;
 import cofh.thermalfoundation.item.TFItems;
-
-import java.io.File;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
@@ -18,15 +15,12 @@ import net.minecraftforge.fml.common.Mod.CustomProperty;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCEvent;
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 @Mod(modid = ThermalFoundation.modId, name = ThermalFoundation.modName, version = ThermalFoundation.version, dependencies = ThermalFoundation.dependencies,
 		guiFactory = ThermalFoundation.modGuiFactory, canBeDeactivated = false, customProperties = @CustomProperty(k = "cofhversion", v = "true"))
@@ -34,8 +28,8 @@ public class ThermalFoundation {
 
 	public static final String modId = "thermalfoundation";
 	public static final String modName = "Thermal Foundation";
-	public static final String version = "1.8.9R1.3.0";
-	public static final String version_max = "1.8.9R1.4.0";
+	public static final String version = "1.10.2R1.3.0";
+	public static final String version_max = "1.10.2R1.4.0";
 	public static final String dependencies = CoFHCore.version_group;
 	public static final String modGuiFactory = "cofh.thermalfoundation.gui.GuiConfigTFFactory";
 
@@ -53,8 +47,8 @@ public class ThermalFoundation {
 	public static final ConfigHandler CONFIG_CLIENT = new ConfigHandler(version);
 
 	public static CreativeTabs tabCommon = new CreativeTabTF();
-	public static CreativeTabs tabTools = CreativeTabs.tabTools;
-	public static CreativeTabs tabArmor = CreativeTabs.tabCombat;
+	public static CreativeTabs tabTools = CreativeTabs.TOOLS;
+	public static CreativeTabs tabArmor = CreativeTabs.COMBAT;
 
 	public static File worldGenOres;
 	public static final String WORLD_GEN_PATH = "assets/thermalfoundation/world/";

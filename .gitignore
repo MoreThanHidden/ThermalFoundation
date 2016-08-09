@@ -13,6 +13,9 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.iml
+*.ipr
+*.iws
 local.properties
 .classpath
 .settings/
@@ -23,6 +26,8 @@ mods/
 resourcepacks/
 saves/
 /options.txt
+/.idea/*
+/run/*
 
 # External tool builders
 .externalToolBuilders/

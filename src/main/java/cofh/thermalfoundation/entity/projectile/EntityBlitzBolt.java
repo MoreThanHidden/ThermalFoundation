@@ -9,13 +9,14 @@ import cofh.thermalfoundation.entity.monster.EntityBlitz;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.init.MobEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,7 +56,7 @@ public class EntityBlitzBolt extends EntityThrowable {
 	}
 
 	@Override
-	protected void onImpact(MovingObjectPosition mop) {
+	protected void onImpact(RayTraceResult mop) {
 
 		if (ServerHelper.isServerWorld(worldObj)) {
 			if (mop.entityHit != null) {
@@ -104,15 +105,15 @@ public class EntityBlitzBolt extends EntityThrowable {
 
 	protected static class PotionEffectBlitz extends PotionEffect {
 
-		public PotionEffectBlitz(int id, int duration, int amplifier) {
+		public PotionEffectBlitz(Potion potion, int duration, int amplifier) {
 
-			super(id, duration, amplifier, true, false);
+			super(potion, duration, amplifier, true, false);
 			getCurativeItems().clear();
 		}
 
 		public PotionEffectBlitz(int duration, int amplifier) {
 
-			this(Potion.confusion.id, duration, amplifier);
+			this(MobEffects.NAUSEA, duration, amplifier);
 		}
 
 	}

@@ -1,19 +1,19 @@
 package cofh.thermalfoundation.block;
 
-import cofh.core.item.ItemBlockCoFHBase;
 import cofh.lib.util.helpers.ItemHelper;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockFlower extends ItemBlockCoFHBase {
+public class ItemBlockFlower extends ItemBlock {
 
 	public ItemBlockFlower(Block block) {
 
 		super(block);
 		setHasSubtypes(true);
 		setMaxDamage(0);
+		setRegistryName(block.getRegistryName().toString() + "Item");
 	}
 
 	@Override

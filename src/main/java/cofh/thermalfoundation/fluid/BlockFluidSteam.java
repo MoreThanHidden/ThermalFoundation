@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class BlockFluidSteam extends BlockFluidCoFHBase {
 
 	public static final int LEVELS = 8;
-	public static final Material materialFluidSteam = new MaterialLiquid(MapColor.silverColor);
+	public static final Material materialFluidSteam = new MaterialLiquid(MapColor.SILVER);
 
 	// private static boolean effect = true;
 

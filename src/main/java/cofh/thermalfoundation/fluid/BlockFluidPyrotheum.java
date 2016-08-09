@@ -4,9 +4,6 @@ import cofh.core.fluid.BlockFluidInteractive;
 import cofh.lib.util.BlockWrapper;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.thermalfoundation.ThermalFoundation;
-
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -16,24 +13,26 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+import java.util.Random;
+
 public class BlockFluidPyrotheum extends BlockFluidInteractive {
 
 	public static final int LEVELS = 5;
-	public static final Material materialFluidPyrotheum = new MaterialLiquid(MapColor.tntColor);
+	public static final Material materialFluidPyrotheum = new MaterialLiquid(MapColor.TNT);
 
 	private static boolean effect = true;
 	private static boolean enableSourceFall = true;
 
 	public BlockFluidPyrotheum(Fluid fluid) {
 
-		super(fluid, Material.lava, "thermalfoundation", "pyrotheum");
+		super(fluid, Material.LAVA, "thermalfoundation", "pyrotheum");
 		setQuantaPerBlock(LEVELS);
 		setTickRate(10);
 
@@ -125,7 +124,7 @@ public class BlockFluidPyrotheum extends BlockFluidInteractive {
 		IBlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
 
-		if (block.isAir(world, pos) || block == this) {
+		if (block.isAir(state, world, pos) || block == this) {
 			return;
 		}
 		int bMeta = block.getMetaFromState(state);
@@ -136,17 +135,18 @@ public class BlockFluidPyrotheum extends BlockFluidInteractive {
 			world.setBlockState(pos, block.getStateFromMeta(bMeta), 2);
 			triggerInteractionEffects(world, pos);
 		} else if (block.isFlammable(world, pos, EnumFacing.UP)) {
-			world.setBlockState(pos, Blocks.fire.getDefaultState(), 2);
+			world.setBlockState(pos, Blocks.FIRE.getDefaultState(), 2);
 		} else if (world.isSideSolid(pos, EnumFacing.UP) && world.isAirBlock(pos.add(0, 1, 0))) {
-			world.setBlockState(pos.add(0, 1, 0), Blocks.fire.getDefaultState(), 2);
+			world.setBlockState(pos.add(0, 1, 0), Blocks.FIRE.getDefaultState(), 2);
 		}
 	}
 
 	protected void triggerInteractionEffects(World world, BlockPos pos) {
 
 		if (world.rand.nextInt(16) == 0) {
-			world.playSoundEffect(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, "random.fizz", 0.5F,
-					2.2F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
+			//TODO get sound event
+//			world.playSoundEffect(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, "random.fizz", 0.5F,
+//					2.2F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.8F);
 		}
 	}
 
@@ -156,18 +156,18 @@ public class BlockFluidPyrotheum extends BlockFluidInteractive {
 
 		GameRegistry.registerBlock(this, "FluidPyrotheum");
 
-		addInteraction(Blocks.cobblestone, Blocks.stone);
-		addInteraction(Blocks.grass, Blocks.dirt);
-		addInteraction(Blocks.sand, Blocks.glass);
-		addInteraction(Blocks.water, Blocks.stone);
-		addInteraction(Blocks.flowing_water, Blocks.stone);
-		addInteraction(Blocks.clay, Blocks.hardened_clay);
-		addInteraction(Blocks.ice, Blocks.stone);
-		addInteraction(Blocks.snow, Blocks.air);
-		addInteraction(Blocks.snow_layer, Blocks.air);
+		addInteraction(Blocks.COBBLESTONE, Blocks.STONE);
+		addInteraction(Blocks.GRASS, Blocks.DIRT);
+		addInteraction(Blocks.SAND, Blocks.GLASS);
+		addInteraction(Blocks.WATER, Blocks.STONE);
+		addInteraction(Blocks.FLOWING_WATER, Blocks.STONE);
+		addInteraction(Blocks.CLAY, Blocks.HARDENED_CLAY);
+		addInteraction(Blocks.ICE, Blocks.STONE);
+		addInteraction(Blocks.SNOW, Blocks.AIR);
+		addInteraction(Blocks.SNOW_LAYER, Blocks.AIR);
 
 		for (int i = 0; i < 8; i++) {
-			addInteraction(Blocks.stone_stairs, i, Blocks.stone_brick_stairs, i);
+			addInteraction(Blocks.STONE_STAIRS, i, Blocks.STONE_BRICK_STAIRS, i);
 		}
 
 		String category = "Fluid.Pyrotheum";

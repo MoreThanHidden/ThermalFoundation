@@ -1,45 +1,45 @@
 package cofh.thermalfoundation.item;
 
-import static cofh.lib.util.helpers.ItemHelper.*;
-
 import cofh.api.core.IInitializer;
-import cofh.core.item.ItemCoFHBase;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.thermalfoundation.ThermalFoundation;
-
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class ItemFertilizer extends ItemCoFHBase implements IInitializer {
+public class ItemFertilizer extends Item implements IInitializer {
 
 	public ItemFertilizer() {
 
-		super("thermalfoundation");
+//		super("thermalfoundation");
 
 		setUnlocalizedName("fertilizer");
 		setCreativeTab(ThermalFoundation.tabCommon);
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-
+	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (!player.canPlayerEdit(pos.offset(side), side, stack)) {
-			return false;
+			return EnumActionResult.FAIL;
 		}
 		int radius = 1 + ItemHelper.getItemDamage(stack);
 		int potency = 2 + ItemHelper.getItemDamage(stack);
 
 		if (onApplyBonemeal(stack, world, pos, player, radius, potency)) {
-			return true;
+			return EnumActionResult.SUCCESS;
 		}
-		return false;
+		return EnumActionResult.FAIL;
 	}
 
 	public static boolean onApplyBonemeal(ItemStack stack, World world, BlockPos pos, EntityPlayer player, int radius, int potency) {
@@ -80,7 +80,7 @@ public class ItemFertilizer extends ItemCoFHBase implements IInitializer {
 						for (int i = 0; i < potency; i++) {
 							growable.grow(world, world.rand, pos, state);
 						}
-						world.playAuxSFX(2005, pos, 0);
+						world.playEvent(2005,pos,0);
 					}
 				}
 				return true;
@@ -92,14 +92,19 @@ public class ItemFertilizer extends ItemCoFHBase implements IInitializer {
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-
+//TODO figure this out
 		fertilizerBasic = addItem(0, "fertilizerBasic");
 		fertilizerRich = addItem(1, "fertilizerRich");
-		//fertilizerFlux = addItem(2, "fertilizerFlux");
+		fertilizerFlux = addItem(2, "fertilizerFlux");
 
 		return true;
 	}
+	public ItemStack addItem(int number, String key) {
 
+		ItemStack item = new ItemStack(new ItemFertilizer(), 1, number);
+		GameRegistry.register(item.getItem(), new ResourceLocation("thermalfoundation:" + key));
+		return item;
+	}
 	@Override
 	public boolean initialize() {
 
@@ -109,10 +114,10 @@ public class ItemFertilizer extends ItemCoFHBase implements IInitializer {
 	@Override
 	public boolean postInit() {
 
-		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerBasic, 8), new Object[] { "dustWood", "dustWood", "dustSaltpeter", "crystalSlag" }));
-		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerBasic, 32), new Object[] { "dustCharcoal", "dustSaltpeter", "crystalSlag" }));
-		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerRich, 8), new Object[] { "dustWood", "dustWood", "dustSaltpeter", "crystalSlagRich" }));
-		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerRich, 32), new Object[] { "dustCharcoal", "dustSaltpeter", "crystalSlagRich" }));
+//		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerBasic, 8), new Object[] { "dustWood", "dustWood", "dustSaltpeter", "crystalSlag" }));
+//		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerBasic, 32), new Object[] { "dustCharcoal", "dustSaltpeter", "crystalSlag" }));
+//		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerRich, 8), new Object[] { "dustWood", "dustWood", "dustSaltpeter", "crystalSlagRich" }));
+//		addRecipe(ShapelessRecipe(ItemHelper.cloneStack(fertilizerRich, 32), new Object[] { "dustCharcoal", "dustSaltpeter", "crystalSlagRich" }));
 
 		return true;
 	}

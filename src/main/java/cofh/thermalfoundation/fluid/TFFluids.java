@@ -2,14 +2,13 @@ package cofh.thermalfoundation.fluid;
 
 import cofh.api.core.IInitializer;
 import cofh.core.fluid.BlockFluidCoFHBase;
-import cofh.core.fluid.FluidCoFHBase;
 import cofh.thermalfoundation.core.ProxyClient;
-
-import java.util.ArrayList;
-
 import net.minecraft.item.EnumRarity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+
+import java.util.ArrayList;
 
 public class TFFluids {
 
@@ -19,8 +18,8 @@ public class TFFluids {
 
 	public static void preInit() {
 
-		registerAllFluids();
-		registerAllFluidBlocks();
+//		registerAllFluids();
+//		registerAllFluidBlocks();
 		createBuckets();
 
 		for (int i = 0; i < initList.size(); i++) {
@@ -46,23 +45,23 @@ public class TFFluids {
 	/* HELPERS */
 	public static void registerAllFluids() {
 
-		fluidSteam = new FluidCoFHBase("steam", "thermalfoundation").setLuminosity(0).setDensity(-1000).setViscosity(200).setTemperature(750).setGaseous(true);
-		fluidCoal = new FluidCoFHBase("coal", "thermalfoundation").setLuminosity(0).setDensity(900).setViscosity(2000).setTemperature(300);
-		fluidRedstone = new FluidCoFHBase("redstone", "thermalfoundation").setLuminosity(7).setDensity(1200).setViscosity(1500).setTemperature(300)
+		fluidSteam = new Fluid("steam", new ResourceLocation("thermalfoundation:steam"), new ResourceLocation("thermalfoundation:steam")).setLuminosity(0).setDensity(-1000).setViscosity(200).setTemperature(750).setGaseous(true);
+		fluidCoal = new Fluid("coal", new ResourceLocation("thermalfoundation:coal"), new ResourceLocation("thermalfoundation:coal")).setLuminosity(0).setDensity(900).setViscosity(2000).setTemperature(300);
+		fluidRedstone = new Fluid("redstone", new ResourceLocation("thermalfoundation:redstone"), new ResourceLocation("thermalfoundation:redstone")).setLuminosity(7).setDensity(1200).setViscosity(1500).setTemperature(300)
 				.setRarity(EnumRarity.UNCOMMON);
-		fluidGlowstone = new FluidCoFHBase("glowstone", "thermalfoundation").setLuminosity(15).setDensity(-500).setViscosity(100).setTemperature(300)
+		fluidGlowstone = new Fluid("glowstone", new ResourceLocation("thermalfoundation:glowstone"), new ResourceLocation("thermalfoundation:glowstone")).setLuminosity(15).setDensity(-500).setViscosity(100).setTemperature(300)
 				.setGaseous(true).setRarity(EnumRarity.UNCOMMON);
-		fluidEnder = new FluidCoFHBase("ender", "thermalfoundation").setLuminosity(3).setDensity(4000).setViscosity(3000).setTemperature(300)
+		fluidEnder = new Fluid("ender", new ResourceLocation("thermalfoundation:ender"), new ResourceLocation("thermalfoundation:ender")).setLuminosity(3).setDensity(4000).setViscosity(3000).setTemperature(300)
 				.setRarity(EnumRarity.UNCOMMON);
-		fluidPyrotheum = new FluidCoFHBase("pyrotheum", "thermalfoundation").setLuminosity(15).setDensity(2000).setViscosity(1200).setTemperature(4000)
+		fluidPyrotheum = new Fluid("pyrotheum", new ResourceLocation("thermalfoundation:pyrotheum"), new ResourceLocation("thermalfoundation:pyrotheum")).setLuminosity(15).setDensity(2000).setViscosity(1200).setTemperature(4000)
 				.setRarity(EnumRarity.RARE);
-		fluidCryotheum = new FluidCoFHBase("cryotheum", "thermalfoundation").setLuminosity(0).setDensity(4000).setViscosity(3000).setTemperature(50)
+		fluidCryotheum = new Fluid("cryotheum", new ResourceLocation("thermalfoundation:cryotheum"), new ResourceLocation("thermalfoundation:cryotheum")).setLuminosity(0).setDensity(4000).setViscosity(3000).setTemperature(50)
 				.setRarity(EnumRarity.RARE);
-		fluidAerotheum = new FluidCoFHBase("aerotheum", "thermalfoundation").setLuminosity(0).setDensity(-800).setViscosity(100).setTemperature(300)
+		fluidAerotheum = new Fluid("aerotheum", new ResourceLocation("thermalfoundation:aerotheum"), new ResourceLocation("thermalfoundation:aerotheum")).setLuminosity(0).setDensity(-800).setViscosity(100).setTemperature(300)
 				.setGaseous(true).setRarity(EnumRarity.RARE);
-		fluidPetrotheum = new FluidCoFHBase("petrotheum", "thermalfoundation").setLuminosity(0).setDensity(4000).setViscosity(1500).setTemperature(400)
+		fluidPetrotheum = new Fluid("petrotheum", new ResourceLocation("thermalfoundation:petrotheum"), new ResourceLocation("thermalfoundation:petrotheum")).setLuminosity(0).setDensity(4000).setViscosity(1500).setTemperature(400)
 				.setRarity(EnumRarity.RARE);
-		fluidMana = new FluidCoFHBase("mana", "thermalfoundation").setLuminosity(15).setDensity(600).setViscosity(6000).setTemperature(350)
+		fluidMana =new Fluid("mana", new ResourceLocation("thermalfoundation:mana"), new ResourceLocation("thermalfoundation:mana")).setLuminosity(15).setDensity(600).setViscosity(6000).setTemperature(350)
 				.setRarity(EnumRarity.EPIC);
 
 		registerFluid(fluidSteam, "steam");

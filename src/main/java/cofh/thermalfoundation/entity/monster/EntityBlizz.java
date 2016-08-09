@@ -7,30 +7,25 @@ import cofh.lib.util.helpers.MathHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.entity.projectile.EntityBlizzBolt;
 import cofh.thermalfoundation.item.ItemMaterial;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAIMoveTowardsRestriction;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 public class EntityBlizz extends EntityElemental {
 
@@ -82,21 +77,21 @@ public class EntityBlizz extends EntityElemental {
 				0xE0FBFF, 0x6BE6FF);
 
 		// Add Blizz spawn to Cold biomes
-		List<BiomeGenBase> validBiomes = new ArrayList<BiomeGenBase>(Arrays.asList(BiomeDictionary.getBiomesForType(Type.COLD)));
+		List<Biome> validBiomes = new ArrayList<Biome>(Arrays.asList(BiomeDictionary.getBiomesForType(Type.COLD)));
 
 		// Add Blizz spawn to Snowy biomes (in vanilla, all snowy are also cold)
-		for (BiomeGenBase biome : BiomeDictionary.getBiomesForType(Type.SNOWY)) {
+		for (Biome biome : BiomeDictionary.getBiomesForType(Type.SNOWY)) {
 			if (!validBiomes.contains(biome)) {
 				validBiomes.add(biome);
 			}
 		}
 		// Remove Blizz spawn from End biomes
-		for (BiomeGenBase biome : BiomeDictionary.getBiomesForType(Type.END)) {
+		for (Biome biome : BiomeDictionary.getBiomesForType(Type.END)) {
 			if (validBiomes.contains(biome)) {
 				validBiomes.remove(biome);
 			}
 		}
-		EntityRegistry.addSpawn(EntityBlizz.class, spawnWeight, spawnMin, spawnMax, EnumCreatureType.MONSTER, validBiomes.toArray(new BiomeGenBase[0]));
+		EntityRegistry.addSpawn(EntityBlizz.class, spawnWeight, spawnMin, spawnMax, EnumCreatureType.MONSTER, validBiomes.toArray(new Biome[0]));
 	}
 
 	public EntityBlizz(World world) {
@@ -110,7 +105,7 @@ public class EntityBlizz extends EntityElemental {
 		this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true, new Class[0]));
 		this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
 
-		soundAmbient = CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_ambient");
+		soundAmbient = new SoundEvent(new ResourceLocation(CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_ambient")));
 		soundAttack = CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_attack");
 		soundLiving = new String[] { CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_breathe0"),
 				CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_breathe1"), CoreUtils.getSoundName(ThermalFoundation.modId, "mob_blizz_breathe2") };
@@ -124,7 +119,7 @@ public class EntityBlizz extends EntityElemental {
 		if (wasHitByPlayer) {
 			int items = this.rand.nextInt(4 + looting);
 			for (int i = 0; i < items; i++) {
-				this.entityDropItem(new ItemStack(Items.snowball), 0);
+				this.entityDropItem(new ItemStack(Items.SNOWBALL), 0);
 			}
 			items = this.rand.nextInt(2 + looting);
 			for (int i = 0; i < items; i++) {
@@ -212,13 +207,13 @@ public class EntityBlizz extends EntityElemental {
 
 					if (this.field_179467_b > 1) {
 						double f = Math.sqrt(Math.sqrt(d0)) * 0.5F;
-						this.blizz.worldObj.playAuxSFXAtEntity((EntityPlayer) null, 1009, new BlockPos((int) this.blizz.posX, (int) this.blizz.posY,
+						this.blizz.worldObj.playEvent((EntityPlayer) null, 1009, new BlockPos((int) this.blizz.posX, (int) this.blizz.posY,
 								(int) this.blizz.posZ), 0);
 
 						for (int i = 0; i < 1; ++i) {
 							EntityBlizzBolt bolt = new EntityBlizzBolt(this.blizz.worldObj, this.blizz);
 							bolt.posY = this.blizz.posY + this.blizz.height / 2.0F + 0.5D;
-							this.blizz.playSound(soundAttack, 2.0F, (this.blizz.rand.nextFloat() - this.blizz.rand.nextFloat()) * 0.2F + 1.0F);
+							this.blizz.playSound(new SoundEvent(new ResourceLocation(soundAttack)), 2.0F, (this.blizz.rand.nextFloat() - this.blizz.rand.nextFloat()) * 0.2F + 1.0F);
 							this.blizz.worldObj.spawnEntityInWorld(bolt);
 						}
 					}

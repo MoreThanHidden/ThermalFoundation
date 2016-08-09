@@ -2,12 +2,11 @@ package cofh.thermalfoundation.fluid;
 
 import cofh.core.fluid.BlockFluidCoFHBase;
 import cofh.thermalfoundation.ThermalFoundation;
-
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialLiquid;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.Fluid;
@@ -16,13 +15,13 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class BlockFluidCoal extends BlockFluidCoFHBase {
 
 	public static final int LEVELS = 6;
-	public static final Material materialFluidCoal = new MaterialLiquid(MapColor.grayColor);
+	public static final Material materialFluidCoal = new MaterialLiquid(MapColor.GRAY);
 
 	private static boolean effect = true;
 
 	public BlockFluidCoal(Fluid fluid) {
 
-		super(fluid, Material.water, "thermalfoundation", "coal");
+		super(fluid, Material.WATER, "thermalfoundation", "coal");
 		setQuantaPerBlock(LEVELS);
 		setTickRate(10);
 
