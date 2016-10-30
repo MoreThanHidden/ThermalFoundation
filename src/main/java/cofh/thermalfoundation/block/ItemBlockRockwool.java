@@ -18,7 +18,11 @@ public class ItemBlockRockwool extends ItemBlock {
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 
-		return "tile.thermalfoundation.rockwool." + BlockRockwool.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName() + ".name";
+		return "tile.thermalfoundation.rockwool." + BlockRockwool.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName();
 	}
 
+	@Override
+	public int getMetadata(int damage) {
+		return damage;
+	}
 }

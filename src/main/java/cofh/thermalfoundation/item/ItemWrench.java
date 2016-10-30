@@ -5,15 +5,16 @@ import cofh.api.core.IInitializer;
 import cofh.api.core.IModelRegister;
 import cofh.api.item.IToolHammer;
 import cofh.asm.relauncher.Implementable;
+import cofh.core.StateMapper;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -36,9 +37,10 @@ import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.tuple.MutablePair;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -48,12 +50,29 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
     public Map<Pair<Integer, String>, Item> items = new TreeMap<Pair<Integer, String>, Item>();
     public ItemWrench() {
 
-        setUnlocalizedName("thermalfoundation:wrench");
+        setUnlocalizedName("thermalfoundation.tool.wrenchBasic");
         setCreativeTab(ThermalFoundation.tabCommon);
 
         setHasSubtypes(true);
         setHarvestLevel("wrench", 1);
     }
+
+    @Override
+    public String getUnlocalizedName(ItemStack stack) {
+        for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+            if(entry.getKey().getLeft() == stack.getItemDamage()){return "item.thermalfoundation.tool." + entry.getKey().getRight();}
+        }
+        return "item.thermalfoundation.tool";
+    }
+
+    @Override
+    public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+        for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+            subItems.add(new ItemStack(entry.getValue(), 1,entry.getKey().getLeft()));
+        }
+    }
+
+
 
     @Override
     public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
@@ -64,6 +83,7 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
     public EnumActionResult onItemUse(ItemStack stack, EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         return player.canPlayerEdit(pos.offset(side), side, stack) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
     }
+
 
     @Override
     public EnumActionResult onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
@@ -94,7 +114,7 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
     @Override
     public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
         Multimap multimap = HashMultimap.create();
-        //figure out
+        //TODO figure out
 //		multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getAttributeUnlocalizedName(), new AttributeModifier(itemModifierUUID, "Tool modifier", 1, 0));
         return multimap;
     }
@@ -105,15 +125,10 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
 	public void registerModels() {
 
 		ModelBakery.registerItemVariants(this);
-		ModelLoader.setCustomMeshDefinition(this, new ItemMeshDefinition() {
-            @Override
-            public ModelResourceLocation getModelLocation(ItemStack stack) {
-                return new ModelResourceLocation("thermalfoundation" + ":" + "tool", "wrenchBasic");
-            }
-        });
+		ModelLoader.setCustomMeshDefinition(this, new StateMapper("thermalfoundation", "tool", "wrenchbasic"));
 
         for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
-            ModelLoader.setCustomModelResourceLocation(this, entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation" + ":" + "tool", entry.getKey().getRight()));
+            ModelLoader.setCustomModelResourceLocation(this, entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation:tool", entry.getKey().getRight().toLowerCase()));
         }
 	}
 
@@ -169,9 +184,16 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
     }
 
     public ItemStack addItem(int number, String key) {
-        ItemStack item = new ItemStack(new ItemWrench(), 1, number);
-        GameRegistry.register(item.getItem(), new ResourceLocation("thermalfoundation:" + key));
-        items.put(new MutablePair<Integer, String>(number, key), item.getItem());
+        if (items.containsKey(Pair.of(number, key))){
+            return null;
+        }
+        items.put(Pair.of(number, key), this);
+
+        ItemStack item = new ItemStack(this, 1, number);
+        if(Item.REGISTRY.getNameForObject(this) == null) {
+            GameRegistry.register(this, new ResourceLocation("thermalfoundation:wrench"));
+        }
+
         return item;
     }
 
@@ -183,8 +205,7 @@ public class ItemWrench extends Item implements IInitializer, IToolHammer, IMode
 
     @Override
     public boolean postInit() {
-
-//		addRecipe(ShapedRecipe(wrenchBasic, new Object[] { "I I", " T ", " I ", 'I', "ingotIron", 'T', "ingotTin" }));
+        GameRegistry.addRecipe(new ShapedOreRecipe(wrenchBasic, "I I", " T ", " I ", 'I', "ingotIron", 'T', "ingotTin"));
 
         return true;
     }

@@ -1,7 +1,9 @@
 package cofh.thermalfoundation.item;
 
 import cofh.api.core.IInitializer;
+import cofh.api.core.IModelRegister;
 import cofh.api.tileentity.IPortableData;
+import cofh.core.StateMapper;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.lib.util.helpers.ServerHelper;
 import cofh.lib.util.helpers.StringHelper;
@@ -9,7 +11,11 @@ import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.util.PatternHelper;
 import cofh.thermalfoundation.util.RedprintHelper;
 import cofh.thermalfoundation.util.SchematicHelper;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,11 +24,21 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class ItemDiagram extends Item implements IInitializer {
+import static cofh.lib.util.helpers.ItemHelper.ShapelessRecipe;
+import static cofh.lib.util.helpers.ItemHelper.addRecipe;
+
+public class ItemDiagram extends Item implements IInitializer, IModelRegister {
+	public Map<Pair<Integer, String>, Item> items = new TreeMap<Pair<Integer, String>, Item>();
 
 	public ItemDiagram() {
 
@@ -32,6 +48,21 @@ public class ItemDiagram extends Item implements IInitializer {
 		setCreativeTab(ThermalFoundation.tabCommon);
 
 		setHasSubtypes(true);
+	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			if(entry.getKey().getLeft() == stack.getItemDamage()){return "item.thermalfoundation.diagram." + entry.getKey().getRight();}
+		}
+		return "item.thermalfoundation.diagram";
+	}
+
+	@Override
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			subItems.add(new ItemStack(entry.getValue(), 1,entry.getKey().getLeft()));
+		}
 	}
 
 	@Override
@@ -149,25 +180,21 @@ public class ItemDiagram extends Item implements IInitializer {
 
 		return RedprintHelper.getDisplayName(stack).isEmpty() ? EnumRarity.COMMON : EnumRarity.UNCOMMON;
 	}
-//TODO figure this out
-//	/* IModelRegister */
-//	@Override
-//	@SideOnly(Side.CLIENT)
-//	public void registerModels() {
-//
-////		StateMapper mapper = new StateMapper(modName, "tool", name);
-//		ModelBakery.registerItemVariants(this);
-////		ModelLoader.setCustomMeshDefinition(this, mapper);
-//
-////		for (Map.Entry<Integer, ItemEntry> entry : itemMap.entrySet()) {
-////			ModelLoader.setCustomModelResourceLocation(this, entry.getKey(), new ModelResourceLocation(modName + ":" + "tool", entry.getValue().name));
-////		}
-//	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerModels() {
+
+		for (final Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			ModelBakery.registerItemVariants(entry.getValue());
+			ModelLoader.setCustomMeshDefinition(entry.getValue(), new StateMapper("thermalfoundation", "tool", entry.getKey().getRight()));
+			ModelLoader.setCustomModelResourceLocation(entry.getValue(), entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation:tool", entry.getKey().getRight()));
+		}
+	}
 
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
-//TODO figure this out
 		schematic = addItem(Type.SCHEMATIC.ordinal(), "schematic");
 		redprint = addItem(Type.REDPRINT.ordinal(), "redprint");
 
@@ -183,17 +210,25 @@ public class ItemDiagram extends Item implements IInitializer {
 	@Override
 	public boolean postInit() {
 
-//		addRecipe(ShapelessRecipe(schematic, new Object[] { Items.PAPER, Items.PAPER, "dyeBlue" }));
-//		addRecipe(ShapelessRecipe(redprint, new Object[] { Items.PAPER, Items.PAPER, "dustRedstone" }));
+		addRecipe(ShapelessRecipe(schematic, Items.PAPER, Items.PAPER, "dyeBlue"));
+		addRecipe(ShapelessRecipe(redprint, Items.PAPER, Items.PAPER, "dustRedstone"));
 
 		return true;
 	}
-	public ItemStack addItem(int number, String key) {
 
-		ItemStack item = new ItemStack(new ItemDiagram(), 1, number);
-		GameRegistry.register(item.getItem(), new ResourceLocation("thermalfoundation:" + key));
+	public ItemStack addItem(int number, String key) {
+		if (items.containsKey(Pair.of(number, key))){
+			return null;
+		}
+		items.put(Pair.of(number, key), this);
+
+		ItemStack item = new ItemStack(this, 1, number);
+		if(Item.REGISTRY.getNameForObject(this) == null) {
+			GameRegistry.register(this, new ResourceLocation("thermalfoundation:diagram"));
+		}
 		return item;
 	}
+
 	/* REFERENCES */
 	public static ItemStack schematic;
 	public static ItemStack pattern;

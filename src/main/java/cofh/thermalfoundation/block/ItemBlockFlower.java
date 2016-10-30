@@ -19,13 +19,18 @@ public class ItemBlockFlower extends ItemBlock {
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 
-		return "tile.thermalfoundation.flower." + BlockFlower.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName() + ".name";
+		return "tile.thermalfoundation.flower." + BlockFlower.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName();
 	}
 
 	@Override
 	public EnumRarity getRarity(ItemStack stack) {
 
 		return BlockFlower.Type.byMetadata(ItemHelper.getItemDamage(stack)).getRarity();
+	}
+
+	@Override
+	public int getMetadata(int damage) {
+		return damage;
 	}
 
 }

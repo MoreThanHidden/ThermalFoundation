@@ -2,13 +2,14 @@ package cofh.thermalfoundation.item;
 
 import cofh.api.core.IInitializer;
 import cofh.api.core.IModelRegister;
+import cofh.core.StateMapper;
 import cofh.core.util.energy.FurnaceFuelHandler;
 import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.core.TFProps;
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static cofh.lib.util.helpers.ItemHelper.*;
+
 public class ItemMaterial extends Item implements IInitializer, IModelRegister{
 	public Map<Pair<Integer, String>, Item> items = new TreeMap<Pair<Integer, String>, Item>();
 
@@ -31,20 +34,29 @@ public class ItemMaterial extends Item implements IInitializer, IModelRegister{
 
 //		super("thermalfoundation");
 
-		setUnlocalizedName("thermalfoundation:material");
+		setUnlocalizedName("thermalfoundation.material");
 		setCreativeTab(ThermalFoundation.tabCommon);
 		setHasSubtypes(true);
 	}
 
 	@Override
 	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
-		super.getSubItems(itemIn, tab, subItems);
 		for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
 			subItems.add(new ItemStack(entry.getValue(), 1,entry.getKey().getLeft()));
 		}
 	}
 
-	/* IInitializer */
+    @Override
+    public String getUnlocalizedName(ItemStack stack) {
+        for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+           if (entry.getKey().getLeft() == stack.getItemDamage()){
+               return "item.thermalfoundation.material." + entry.getKey().getRight();
+           }
+        }
+        return "item.thermalfoundation.material";
+    }
+
+    /* IInitializer */
 	@Override
 	public boolean preInit() {
 
@@ -155,11 +167,19 @@ public class ItemMaterial extends Item implements IInitializer, IModelRegister{
 	}
 
 	public ItemStack addItem(int number, String key) {
+
+        if (items.containsKey(Pair.of(number, key))){
+            return null;
+        }
+
+        items.put(Pair.of(number, key), this);
+
 		ItemStack item = new ItemStack(this, 1, number);
 		System.out.println(Item.REGISTRY.getNameForObject(this));
-		if(Item.REGISTRY.getNameForObject(this) ==null) {
-			GameRegistry.register(this, new ResourceLocation("thermalfoundation:" + key));
+		if(Item.REGISTRY.getNameForObject(this) == null) {
+			GameRegistry.register(this, new ResourceLocation("thermalfoundation:material"));
 		}
+
 		return item;
 	}
 
@@ -177,17 +197,11 @@ public class ItemMaterial extends Item implements IInitializer, IModelRegister{
 
 		for (final Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
 		ModelBakery.registerItemVariants(entry.getValue());
-		ModelLoader.setCustomMeshDefinition(entry.getValue(), new ItemMeshDefinition() {
-			@Override
-			public ModelResourceLocation getModelLocation(ItemStack stack) {
-				return new ModelResourceLocation("thermalfoundation" + ":" + "material", entry.getKey().getRight());
-			}
-		});
-
-
-			ModelLoader.setCustomModelResourceLocation(entry.getValue(), entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation" + ":" + "material", entry.getKey().getRight()));
-		}
+		ModelLoader.setCustomMeshDefinition(entry.getValue(), new StateMapper("thermalfoundation", "material", entry.getKey().getRight()));
+        ModelLoader.setCustomModelResourceLocation(entry.getValue(), entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation:material", entry.getKey().getRight()));
+        }
 	}
+
 	@Override
 	public boolean initialize() {
 
@@ -202,96 +216,96 @@ public class ItemMaterial extends Item implements IInitializer, IModelRegister{
 	public boolean postInit() {
 
 		/* Smelting */
-//		addSmelting(ingotIron, dustIron, 0.0F);
-//		addSmelting(ingotGold, dustGold, 0.0F);
-//		addSmelting(ingotCopper, dustCopper, 0.0F);
-//		addSmelting(ingotTin, dustTin, 0.0F);
-//		addSmelting(ingotSilver, dustSilver, 0.0F);
-//		addSmelting(ingotLead, dustLead, 0.0F);
-//		addSmelting(ingotNickel, dustNickel, 0.0F);
-//		addSmelting(ingotPlatinum, dustPlatinum, 0.0F);
-//		addSmelting(ingotMithril, dustMithril, 0.0F);
-//		addSmelting(ingotElectrum, dustElectrum, 0.0F);
-//		addSmelting(ingotInvar, dustInvar, 0.0F);
-//		addSmelting(ingotBronze, dustBronze, 0.0F);
-//		addSmelting(ingotSignalum, dustSignalum, 0.0F);
-//		addSmelting(ingotLumium, dustLumium, 0.0F);
+        addSmelting(ingotIron, dustIron, 0.0F);
+        addSmelting(ingotGold, dustGold, 0.0F);
+        addSmelting(ingotCopper, dustCopper, 0.0F);
+        addSmelting(ingotTin, dustTin, 0.0F);
+        addSmelting(ingotSilver, dustSilver, 0.0F);
+        addSmelting(ingotLead, dustLead, 0.0F);
+        addSmelting(ingotNickel, dustNickel, 0.0F);
+        addSmelting(ingotPlatinum, dustPlatinum, 0.0F);
+        addSmelting(ingotMithril, dustMithril, 0.0F);
+        addSmelting(ingotElectrum, dustElectrum, 0.0F);
+        addSmelting(ingotInvar, dustInvar, 0.0F);
+        addSmelting(ingotBronze, dustBronze, 0.0F);
+        addSmelting(ingotSignalum, dustSignalum, 0.0F);
+        addSmelting(ingotLumium, dustLumium, 0.0F);
 		// No Enderium
 
 		/* Alloy Recipes */
-//		addRecipe(ShapelessRecipe(cloneStack(dustElectrum, 2), new Object[] { "dustGold", "dustSilver" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustInvar, 3), new Object[] { "dustIron", "dustIron", "dustNickel" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustBronze, 4), new Object[] { "dustCopper", "dustCopper", "dustCopper", "dustTin" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustSignalum, 4), new Object[] { "dustCopper", "dustCopper", "dustCopper", "dustSilver", "bucketRedstone" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustLumium, 4), new Object[] { "dustTin", "dustTin", "dustTin", "dustSilver", "bucketGlowstone" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustEnderium, 4), new Object[] { "dustTin", "dustTin", "dustSilver", "dustPlatinum", "bucketEnder" }));
+		addRecipe(ShapelessRecipe(cloneStack(dustElectrum, 2), "dustGold", "dustSilver"));
+		addRecipe(ShapelessRecipe(cloneStack(dustInvar, 3), "dustIron", "dustIron", "dustNickel"));
+		addRecipe(ShapelessRecipe(cloneStack(dustBronze, 4), "dustCopper", "dustCopper", "dustCopper", "dustTin"));
+		addRecipe(ShapelessRecipe(cloneStack(dustSignalum, 4), "dustCopper", "dustCopper", "dustCopper", "dustSilver", "bucketRedstone"));
+		addRecipe(ShapelessRecipe(cloneStack(dustLumium, 4), "dustTin", "dustTin", "dustTin", "dustSilver", "bucketGlowstone"));
+		addRecipe(ShapelessRecipe(cloneStack(dustEnderium, 4), "dustTin", "dustTin", "dustSilver", "dustPlatinum", "bucketEnder"));
 
 		/* Storage */
-//		addTwoWayStorageRecipe(ingotIron, "ingotIron", nuggetIron, "nuggetIron");
-//		addTwoWayStorageRecipe(ingotCopper, "ingotCopper", nuggetCopper, "nuggetCopper");
-//		addTwoWayStorageRecipe(ingotTin, "ingotTin", nuggetTin, "nuggetTin");
-//		addTwoWayStorageRecipe(ingotSilver, "ingotSilver", nuggetSilver, "nuggetSilver");
-//		addTwoWayStorageRecipe(ingotLead, "ingotLead", nuggetLead, "nuggetLead");
-//		addTwoWayStorageRecipe(ingotNickel, "ingotNickel", nuggetNickel, "nuggetNickel");
-//		addTwoWayStorageRecipe(ingotPlatinum, "ingotPlatinum", nuggetPlatinum, "nuggetPlatinum");
-//		addTwoWayStorageRecipe(ingotMithril, "ingotMithril", nuggetMithril, "nuggetMithril");
-//		addTwoWayStorageRecipe(ingotElectrum, "ingotElectrum", nuggetElectrum, "nuggetElectrum");
-//		addTwoWayStorageRecipe(ingotInvar, "ingotInvar", nuggetInvar, "nuggetInvar");
-//		addTwoWayStorageRecipe(ingotBronze, "ingotBronze", nuggetBronze, "nuggetBronze");
-//		addTwoWayStorageRecipe(ingotSignalum, "ingotSignalum", nuggetSignalum, "nuggetSignalum");
-//		addTwoWayStorageRecipe(ingotLumium, "ingotLumium", nuggetLumium, "nuggetLumium");
-//		addTwoWayStorageRecipe(ingotEnderium, "ingotEnderium", nuggetEnderium, "nuggetEnderium");
+		addTwoWayStorageRecipe(ingotIron, "ingotIron", nuggetIron, "nuggetIron");
+		addTwoWayStorageRecipe(ingotCopper, "ingotCopper", nuggetCopper, "nuggetCopper");
+		addTwoWayStorageRecipe(ingotTin, "ingotTin", nuggetTin, "nuggetTin");
+		addTwoWayStorageRecipe(ingotSilver, "ingotSilver", nuggetSilver, "nuggetSilver");
+		addTwoWayStorageRecipe(ingotLead, "ingotLead", nuggetLead, "nuggetLead");
+		addTwoWayStorageRecipe(ingotNickel, "ingotNickel", nuggetNickel, "nuggetNickel");
+    	addTwoWayStorageRecipe(ingotPlatinum, "ingotPlatinum", nuggetPlatinum, "nuggetPlatinum");
+		addTwoWayStorageRecipe(ingotMithril, "ingotMithril", nuggetMithril, "nuggetMithril");
+		addTwoWayStorageRecipe(ingotElectrum, "ingotElectrum", nuggetElectrum, "nuggetElectrum");
+		addTwoWayStorageRecipe(ingotInvar, "ingotInvar", nuggetInvar, "nuggetInvar");
+		addTwoWayStorageRecipe(ingotBronze, "ingotBronze", nuggetBronze, "nuggetBronze");
+		addTwoWayStorageRecipe(ingotSignalum, "ingotSignalum", nuggetSignalum, "nuggetSignalum");
+		addTwoWayStorageRecipe(ingotLumium, "ingotLumium", nuggetLumium, "nuggetLumium");
+		addTwoWayStorageRecipe(ingotEnderium, "ingotEnderium", nuggetEnderium, "nuggetEnderium");
 
-//		addReverseStorageRecipe(ingotCopper, "blockCopper");
-//		addReverseStorageRecipe(ingotTin, "blockTin");
-//		addReverseStorageRecipe(ingotSilver, "blockSilver");
-//		addReverseStorageRecipe(ingotLead, "blockLead");
-//		addReverseStorageRecipe(ingotNickel, "blockNickel");
-//		addReverseStorageRecipe(ingotPlatinum, "blockPlatinum");
-//		addReverseStorageRecipe(ingotMithril, "blockMithril");
-//		addReverseStorageRecipe(ingotElectrum, "blockElectrum");
-//		addReverseStorageRecipe(ingotInvar, "blockInvar");
-//		addReverseStorageRecipe(ingotBronze, "blockBronze");
-//		addReverseStorageRecipe(ingotSignalum, "blockSignalum");
-//		addReverseStorageRecipe(ingotLumium, "blockLumium");
-//		addReverseStorageRecipe(ingotEnderium, "blockEnderium");
+		addReverseStorageRecipe(ingotCopper, "blockCopper");
+		addReverseStorageRecipe(ingotTin, "blockTin");
+		addReverseStorageRecipe(ingotSilver, "blockSilver");
+		addReverseStorageRecipe(ingotLead, "blockLead");
+		addReverseStorageRecipe(ingotNickel, "blockNickel");
+		addReverseStorageRecipe(ingotPlatinum, "blockPlatinum");
+		addReverseStorageRecipe(ingotMithril, "blockMithril");
+		addReverseStorageRecipe(ingotElectrum, "blockElectrum");
+		addReverseStorageRecipe(ingotInvar, "blockInvar");
+		addReverseStorageRecipe(ingotBronze, "blockBronze");
+		addReverseStorageRecipe(ingotSignalum, "blockSignalum");
+		addReverseStorageRecipe(ingotLumium, "blockLumium");
+		addReverseStorageRecipe(ingotEnderium, "blockEnderium");
 
 		/* Gears */
-//		addGearRecipe(gearIron, "ingotIron");
-//		addGearRecipe(gearGold, "ingotGold");
-//		addGearRecipe(gearCopper, "ingotCopper");
-//		addGearRecipe(gearTin, "ingotTin");
-//		addGearRecipe(gearSilver, "ingotSilver");
-//		addGearRecipe(gearLead, "ingotLead");
-//		addGearRecipe(gearNickel, "ingotNickel");
-//		addGearRecipe(gearPlatinum, "ingotPlatinum");
-//		addGearRecipe(gearMithril, "ingotMithril");
-//		addGearRecipe(gearElectrum, "ingotElectrum");
-//		addGearRecipe(gearInvar, "ingotInvar");
-//		addGearRecipe(gearBronze, "ingotBronze");
-//		addGearRecipe(gearSignalum, "ingotSignalum");
-//		addGearRecipe(gearLumium, "ingotLumium");
-//		addGearRecipe(gearEnderium, "ingotEnderium");
+		addGearRecipe(gearIron, "ingotIron");
+		addGearRecipe(gearGold, "ingotGold");
+		addGearRecipe(gearCopper, "ingotCopper");
+		addGearRecipe(gearTin, "ingotTin");
+		addGearRecipe(gearSilver, "ingotSilver");
+		addGearRecipe(gearLead, "ingotLead");
+		addGearRecipe(gearNickel, "ingotNickel");
+		addGearRecipe(gearPlatinum, "ingotPlatinum");
+		addGearRecipe(gearMithril, "ingotMithril");
+		addGearRecipe(gearElectrum, "ingotElectrum");
+		addGearRecipe(gearInvar, "ingotInvar");
+		addGearRecipe(gearBronze, "ingotBronze");
+		addGearRecipe(gearSignalum, "ingotSignalum");
+		addGearRecipe(gearLumium, "ingotLumium");
+		addGearRecipe(gearEnderium, "ingotEnderium");
 
 		/* Parts */
-//		addRecipe(ShapedRecipe(powerCoilGold, new Object[] { "  R", " G ", "R  ", 'R', "dustRedstone", 'G', "ingotGold" }));
-//		addRecipe(ShapedRecipe(powerCoilSilver, new Object[] { "  R", " G ", "R  ", 'R', "dustRedstone", 'G', "ingotSilver" }));
-//		addRecipe(ShapedRecipe(powerCoilElectrum, new Object[] { "R  ", " G ", "  R", 'R', "dustRedstone", 'G', "ingotElectrum" }));
+		addRecipe(ShapedRecipe(powerCoilGold, "  R", " G ", "R  ", 'R', "dustRedstone", 'G', "ingotGold"));
+		addRecipe(ShapedRecipe(powerCoilSilver, "  R", " G ", "R  ", 'R', "dustRedstone", 'G', "ingotSilver"));
+		addRecipe(ShapedRecipe(powerCoilElectrum, "R  ", " G ", "  R", 'R', "dustRedstone", 'G', "ingotElectrum"));
 
 		/* Mob Drops */
-//		addRecipe(ShapelessRecipe(cloneStack(dustPyrotheum, 2), new Object[] { "dustCoal", "dustSulfur", "dustRedstone", Items.BLAZE_POWDER }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustCryotheum, 2), new Object[] { Items.SNOWBALL, "dustSaltpeter", "dustRedstone", "dustBlizz" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustAerotheum, 2), new Object[] { "sand", "dustSaltpeter", "dustRedstone", "dustBlitz" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustPetrotheum, 2), new Object[] { Items.CLAY_BALL, "dustObsidian", "dustRedstone", "dustBasalz" }));
-//		addRecipe(ShapelessRecipe(cloneStack(dustBlizz, 2), "rodBlizz"));
-//		addRecipe(ShapelessRecipe(cloneStack(dustBlitz, 2), "rodBlitz"));
-//		addRecipe(ShapelessRecipe(cloneStack(dustBasalz, 2), "rodBasalz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustPyrotheum, 2), "dustCoal", "dustSulfur", "dustRedstone", Items.BLAZE_POWDER));
+		addRecipe(ShapelessRecipe(cloneStack(dustCryotheum, 2), Items.SNOWBALL, "dustSaltpeter", "dustRedstone", "dustBlizz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustAerotheum, 2), "sand", "dustSaltpeter", "dustRedstone", "dustBlitz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustPetrotheum, 2), Items.CLAY_BALL, "dustObsidian", "dustRedstone", "dustBasalz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustBlizz, 2), "rodBlizz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustBlitz, 2), "rodBlitz"));
+		addRecipe(ShapelessRecipe(cloneStack(dustBasalz, 2), "rodBasalz"));
 
 		/* Misc Recipes */
-//		addSmelting(dustWoodCompressed, new ItemStack(Items.COAL, 1, 1), 0.15F);
+GameRegistry.addSmelting(dustWoodCompressed, new ItemStack(Items.COAL, 1, 1), 0.15F);
 
-//		addRecipe(ShapedRecipe(dustWoodCompressed, new Object[] { "###", "# #", "###", '#', "dustWood" }));
-//		addRecipe(ShapelessRecipe(new ItemStack(Items.CLAY_BALL, 4), new Object[] { crystalSlag, crystalSlag, Blocks.DIRT, Items.WATER_BUCKET }));
+		addRecipe(ShapedRecipe(dustWoodCompressed, "###", "# #", "###", '#', "dustWood"));
+		addRecipe(ShapelessRecipe(new ItemStack(Items.CLAY_BALL, 4), crystalSlag, crystalSlag, Blocks.DIRT, Items.WATER_BUCKET));
 
 		return true;
 	}

@@ -6,7 +6,6 @@ import cofh.core.block.BlockCoFHBase;
 import cofh.thermalfoundation.ThermalFoundation;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -35,7 +34,7 @@ import static cofh.lib.util.helpers.ItemHelper.registerWithHandlers;
 
 public class BlockStorage extends BlockCoFHBase implements IInitializer, IModelRegister {
 
-	public static final PropertyEnum<BlockStorage.Type> VARIANT = PropertyEnum.<BlockStorage.Type> create("type", BlockStorage.Type.class);
+	public static final PropertyEnum<BlockStorage.Type> VARIANT = PropertyEnum.create("type", BlockStorage.Type.class);
 
 	public BlockStorage() {
 
@@ -59,7 +58,7 @@ public class BlockStorage extends BlockCoFHBase implements IInitializer, IModelR
 	@Override
 	protected BlockStateContainer createBlockState() {
 
-		return new BlockStateContainer(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, VARIANT);
 	}
 
 	@Override
@@ -70,13 +69,6 @@ public class BlockStorage extends BlockCoFHBase implements IInitializer, IModelR
 			list.add(new ItemStack(item, 1, i));
 		}
 	}
-
-//	@Override
-//	public int getDamageValue(World world, BlockPos pos) {
-//
-//		IBlockState state = world.getBlockState(pos);
-//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -93,7 +85,7 @@ public class BlockStorage extends BlockCoFHBase implements IInitializer, IModelR
 	@Override
 	public int damageDropped(IBlockState state) {
 
-		return state.getValue(VARIANT).getMetadata();
+		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
 	}
 
 

@@ -5,21 +5,18 @@ import cofh.thermalfoundation.renderer.entity.RenderEntityAsItem;
 import cofh.thermalfoundation.renderer.entity.RenderEntityBasalz;
 import cofh.thermalfoundation.renderer.entity.RenderEntityBlitz;
 import cofh.thermalfoundation.renderer.entity.RenderEntityBlizz;
-
-import java.util.ArrayList;
-
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import java.util.ArrayList;
 
 public class ProxyClient extends Proxy {
 
 	/* INIT */
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-
 		super.preInit(event);
-
 		for (int i = 0; i < modelList.size(); i++) {
 			modelList.get(i).registerModels();
 		}

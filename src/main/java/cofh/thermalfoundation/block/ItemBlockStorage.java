@@ -19,13 +19,18 @@ public class ItemBlockStorage extends ItemBlock {
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
 
-		return "tile.thermalfoundation.storage." + BlockStorage.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName() + ".name";
+		return "tile.thermalfoundation.storage." + BlockStorage.Type.byMetadata(ItemHelper.getItemDamage(stack)).getName();
 	}
 
 	@Override
 	public EnumRarity getRarity(ItemStack stack) {
 
 		return BlockStorage.Type.byMetadata(ItemHelper.getItemDamage(stack)).getRarity();
+	}
+
+	@Override
+	public int getMetadata(int damage) {
+		return damage;
 	}
 
 }

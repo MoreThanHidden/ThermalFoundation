@@ -18,8 +18,8 @@ public class TFFluids {
 
 	public static void preInit() {
 
-//		registerAllFluids();
-//		registerAllFluidBlocks();
+		registerAllFluids();
+		registerAllFluidBlocks();
 		createBuckets();
 
 		for (int i = 0; i < initList.size(); i++) {

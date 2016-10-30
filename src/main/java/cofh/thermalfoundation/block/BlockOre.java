@@ -7,7 +7,6 @@ import cofh.thermalfoundation.ThermalFoundation;
 import cofh.thermalfoundation.item.ItemMaterial;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -54,7 +53,7 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 	@Override
 	protected BlockStateContainer createBlockState() {
 
-		return new BlockStateContainer(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, VARIANT);
 	}
 
 	@Override
@@ -65,13 +64,6 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 			list.add(new ItemStack(item, 1, i));
 		}
 	}
-
-//	@Override
-//	public int getDamageValue(World world, BlockPos pos) {
-//
-//		IBlockState state = world.getBlockState(pos);
-//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -88,7 +80,7 @@ public class BlockOre extends BlockCoFHBase implements IInitializer, IModelRegis
 	@Override
 	public int damageDropped(IBlockState state) {
 
-		return state.getValue(VARIANT).getMetadata();
+		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
 	}
 
 	@Override

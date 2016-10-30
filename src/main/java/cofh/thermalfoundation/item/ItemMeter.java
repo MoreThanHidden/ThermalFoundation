@@ -3,7 +3,9 @@ package cofh.thermalfoundation.item;
 import cofh.api.block.IBlockConfigGui;
 import cofh.api.block.IBlockInfo;
 import cofh.api.core.IInitializer;
+import cofh.api.core.IModelRegister;
 import cofh.api.tileentity.ITileInfo;
+import cofh.core.StateMapper;
 import cofh.core.chat.ChatHelper;
 import cofh.lib.util.helpers.ItemHelper;
 import cofh.lib.util.helpers.ServerHelper;
@@ -11,6 +13,9 @@ import cofh.lib.util.helpers.StringHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelBakery;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -23,22 +28,46 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.ShapedOreRecipe;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class ItemMeter extends Item implements IInitializer {
+public class ItemMeter extends Item implements IInitializer, IModelRegister {
+	public Map<Pair<Integer, String>, Item> items = new TreeMap<Pair<Integer, String>, Item>();
 
 	public ItemMeter() {
 
 //		super("thermalfoundation");
 
-		setUnlocalizedName("thermalfoundation:meter");
+		setUnlocalizedName("thermalfoundation.tool.multimeter");
 		setCreativeTab(ThermalFoundation.tabCommon);
 
 		setHasSubtypes(true);
 	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack stack) {
+		for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			if(entry.getKey().getLeft() == stack.getItemDamage()){return "item.thermalfoundation.tool." + entry.getKey().getRight();}
+		}
+		return "item.thermalfoundation.tool";
+	}
+
+	@Override
+	public void getSubItems(Item itemIn, CreativeTabs tab, List<ItemStack> subItems) {
+		for (Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			subItems.add(new ItemStack(entry.getValue(), 1,entry.getKey().getLeft()));
+		}
+	}
+
 
 	@Override
 	public void addInformation(ItemStack stack, EntityPlayer player, List tooltip, boolean advanced) {
@@ -139,30 +168,35 @@ public class ItemMeter extends Item implements IInitializer {
 	}
 
 	/* IModelRegister */
-//	@Override
-//	@SideOnly(Side.CLIENT)
-//	public void registerModels() {
-//
-//		StateMapper mapper = new StateMapper(modName, "tool", name);
-//		ModelBakery.registerItemVariants(this);
-//		ModelLoader.setCustomMeshDefinition(this, mapper);
-//
-//		for (Map.Entry<Integer, ItemEntry> entry : itemMap.entrySet()) {
-//			ModelLoader.setCustomModelResourceLocation(this, entry.getKey(), new ModelResourceLocation(modName + ":" + "tool", entry.getValue().name));
-//		}
-//	}
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerModels() {
+
+		for (final Map.Entry<Pair<Integer, String>, Item> entry : items.entrySet()) {
+			ModelBakery.registerItemVariants(entry.getValue());
+			ModelLoader.setCustomMeshDefinition(entry.getValue(), new StateMapper("thermalfoundation", "tool", entry.getKey().getRight()));
+			ModelLoader.setCustomModelResourceLocation(entry.getValue(), entry.getKey().getLeft(), new ModelResourceLocation("thermalfoundation:tool", entry.getKey().getRight()));
+		}
+	}
 
 	/* IInitializer */
 	@Override
 	public boolean preInit() {
 
 		multimeter = addItem(Type.MULTIMETER.ordinal(), "multimeter");
-
 		return true;
 	}
 	public ItemStack addItem(int number, String key) {
-		ItemStack item = new ItemStack(new ItemMeter(), 1, number);
-		GameRegistry.register(item.getItem(), new ResourceLocation("thermalfoundation:" + key));
+		if (items.containsKey(Pair.of(number, key))){
+			return null;
+		}
+		items.put(Pair.of(number, key), this);
+
+		ItemStack item = new ItemStack(this, 1, number);
+		if(Item.REGISTRY.getNameForObject(this) == null) {
+			GameRegistry.register(this, new ResourceLocation("thermalfoundation:meter"));
+		}
+
 		return item;
 	}
 
@@ -174,10 +208,7 @@ public class ItemMeter extends Item implements IInitializer {
 
 	@Override
 	public boolean postInit() {
-//TODO fix
-//		addRecipe(ShapedRecipe(multimeter, new Object[] { "C C", "LPL", " G ", 'C', "ingotCopper", 'L', "ingotLead", 'P', ItemMaterial.powerCoilElectrum, 'G',
-//				"gearElectrum" }));
-
+		GameRegistry.addRecipe(new ShapedOreRecipe(multimeter, "C C", "LPL", " G ", 'C', "ingotCopper", 'L', "ingotLead", 'P', ItemMaterial.powerCoilElectrum, 'G', "gearElectrum"));
 		return true;
 	}
 
@@ -186,7 +217,7 @@ public class ItemMeter extends Item implements IInitializer {
 
 	/* TYPE */
 	enum Type {
-		MULTIMETER, DEBUGGER;
+		MULTIMETER, DEBUGGER
 	}
 
 }

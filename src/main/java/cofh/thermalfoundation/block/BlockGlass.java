@@ -10,7 +10,6 @@ import cofh.lib.util.helpers.WrenchHelper;
 import cofh.thermalfoundation.ThermalFoundation;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -41,7 +40,7 @@ import java.util.Random;
 
 public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitializer, IModelRegister {
 
-	public static final PropertyEnum<BlockGlass.Type> VARIANT = PropertyEnum.<BlockGlass.Type> create("type", BlockGlass.Type.class);
+	public static final PropertyEnum<BlockGlass.Type> VARIANT = PropertyEnum.create("type", BlockGlass.Type.class);
 
 	public BlockGlass() {
 
@@ -53,12 +52,13 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 		setHardness(3.0F);
 		setResistance(200.0F);
 		setSoundType(SoundType.GLASS);
-	}
+		setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, Type.BRONZE));
+}
 
 	@Override
 	protected BlockStateContainer createBlockState() {
 
-		return new BlockStateContainer(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, VARIANT);
 	}
 
 	@Override
@@ -81,12 +81,6 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 		return BlockRenderLayer.TRANSLUCENT;
 	}
 
-//	@Override
-//	public int getDamageValue(World world, BlockPos pos) {
-//
-//		IBlockState state = world.getBlockState(pos);
-//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-//	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
@@ -103,7 +97,7 @@ public class BlockGlass extends BlockCoFHBase implements IDismantleable, IInitia
 	@Override
 	public int damageDropped(IBlockState state) {
 
-		return state.getValue(VARIANT).getMetadata();
+		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
 	}
 
 	@Override
