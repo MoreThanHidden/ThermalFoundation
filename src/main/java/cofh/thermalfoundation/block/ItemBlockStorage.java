@@ -13,7 +13,7 @@ public class ItemBlockStorage extends ItemBlock {
 		super(block);
 		setHasSubtypes(true);
 		setMaxDamage(0);
-		setRegistryName(block.getRegistryName().toString() + "Item");
+		setRegistryName(block.getRegistryName().toString());
 	}
 
 	@Override

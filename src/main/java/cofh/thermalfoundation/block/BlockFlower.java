@@ -69,13 +69,6 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 		}
 	}
 
-//	@Override
-//	public int getDamageValue(World world, BlockPos pos) {
-//
-//		IBlockState state = world.getBlockState(pos);
-//		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
-//	}
-
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
 
@@ -110,7 +103,7 @@ public class BlockFlower extends BlockCoFHBase implements IInitializer, IModelRe
 	@Override
 	public int damageDropped(IBlockState state) {
 
-		return state.getValue(VARIANT).getMetadata();
+		return state.getBlock() != this ? 0 : state.getValue(VARIANT).getMetadata();
 	}
 
 	@Override

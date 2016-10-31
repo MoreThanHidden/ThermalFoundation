@@ -210,6 +210,7 @@ public class EntityBasalz extends EntityElemental {
 						for (int i = 0; i < 1; ++i) {
 							EntityBasalzBolt bolt = new EntityBasalzBolt(this.basalz.worldObj, this.basalz);
 							bolt.posY = this.basalz.posY + this.basalz.height / 2.0F + 0.5D;
+							bolt.setThrowableHeading(d1, d2, d3, 0.5f, 1);
 							this.basalz.playSound(new SoundEvent(new ResourceLocation(soundAttack)), 2.0F, (this.basalz.rand.nextFloat() - this.basalz.rand.nextFloat()) * 0.2F + 1.0F);
 							this.basalz.worldObj.spawnEntityInWorld(bolt);
 						}

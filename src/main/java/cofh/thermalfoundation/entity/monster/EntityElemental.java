@@ -69,18 +69,8 @@ public abstract class EntityElemental extends EntityMob {
 		super.playHurtSound(source);
 	}
 
-//	@Override
-//	protected String getHurtSound() {
-//
-//		return "mob.blaze.hit";
-//	}
-//
-//	@Override
-//	protected String getDeathSound() {
-//
-//		return "mob.blaze.death";
-//	}
-
+	@Override
+	protected SoundEvent getHurtSound() {return SoundEvents.ENTITY_BLAZE_HURT;}
 
 	@Override
 	protected SoundEvent getDeathSound() {
@@ -135,6 +125,7 @@ public abstract class EntityElemental extends EntityMob {
 			}
 		}
 	}
+
 
 	@Override
 	public void fall(float distance, float damageMultiplier) {

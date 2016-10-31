@@ -211,6 +211,7 @@ public class EntityBlitz extends EntityElemental {
 						for (int i = 0; i < 1; ++i) {
 							EntityBlitzBolt bolt = new EntityBlitzBolt(this.blitz.worldObj, this.blitz);
 							bolt.posY = this.blitz.posY + this.blitz.height / 2.0F + 0.5D;
+							bolt.setThrowableHeading(d1, d2, d3, 0.5f, 1);
 							this.blitz.playSound(new SoundEvent(new ResourceLocation(soundAttack)), 2.0F, (this.blitz.rand.nextFloat() - this.blitz.rand.nextFloat()) * 0.2F + 1.0F);
 							this.blitz.worldObj.spawnEntityInWorld(bolt);
 						}

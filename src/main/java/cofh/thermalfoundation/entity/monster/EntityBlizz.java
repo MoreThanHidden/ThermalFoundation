@@ -213,6 +213,7 @@ public class EntityBlizz extends EntityElemental {
 						for (int i = 0; i < 1; ++i) {
 							EntityBlizzBolt bolt = new EntityBlizzBolt(this.blizz.worldObj, this.blizz);
 							bolt.posY = this.blizz.posY + this.blizz.height / 2.0F + 0.5D;
+							bolt.setThrowableHeading(d1, d2, d3, 0.5f, 1);
 							this.blizz.playSound(new SoundEvent(new ResourceLocation(soundAttack)), 2.0F, (this.blizz.rand.nextFloat() - this.blizz.rand.nextFloat()) * 0.2F + 1.0F);
 							this.blizz.worldObj.spawnEntityInWorld(bolt);
 						}
